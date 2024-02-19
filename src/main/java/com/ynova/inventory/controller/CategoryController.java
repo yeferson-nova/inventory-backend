@@ -8,9 +8,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/v1")
 public class CategoryController {
@@ -80,14 +81,14 @@ public class CategoryController {
 			return validacion(result);
 		}
 		Optional<Category> categoryO = service.porId(id);
-		if (categoryO.isPresent()) {
-			Category categoryDB = categoryO.get();
-			categoryDB.setName(category.getName());
-			categoryDB.setDescription(category.getDescription());
-			return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(categoryDB));
+		if (!category.getName().isEmpty() && service.existePorNombre(category.getName())) {
+			return ResponseEntity.badRequest().body(
+					Collections.singletonMap("Mensaje", "Ya existe una categoria con el nombre " + category.getName()));
 		}
-		return ResponseEntity.notFound().build();
-
+		Category categoryDB = categoryO.get();
+		categoryDB.setName(category.getName());
+		categoryDB.setDescription(category.getDescription());
+		return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(categoryDB));
 	}
 
 	@DeleteMapping("/delete/categories/{id}")
@@ -95,7 +96,7 @@ public class CategoryController {
 		Optional<Category> categoryO = service.porId(id);
 		if (categoryO.isPresent()) {
 			service.eliminar(id);
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.ok().body("Eliminación Exitosa");
 		}
 		return ResponseEntity.notFound().build();
 
