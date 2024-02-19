@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,6 +23,7 @@ import com.ynova.inventory.services.CategoryService;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
@@ -46,7 +48,7 @@ public class CategoryController {
 
 	}
 
-	@GetMapping("{name}")
+	@GetMapping("/categories/{name}")
 	public ResponseEntity<?> porNombre(@PathVariable String nombre) {
 		Optional<Category> categoryO = service.porNombre(nombre);
 		if (categoryO.isPresent()) {
@@ -70,9 +72,34 @@ public class CategoryController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(category));
 	}
 
-	/*
-	 * @DeleteMapping("{id}") public ResponseEntity<?> eliminar
-	 */
+	@PutMapping("/edit/categories/{id}")
+	public ResponseEntity<?> editar(@Valid @RequestBody Category category, BindingResult result,
+			@PathVariable Long id) {
+
+		if (result.hasErrors()) {
+			return validacion(result);
+		}
+		Optional<Category> categoryO = service.porId(id);
+		if (categoryO.isPresent()) {
+			Category categoryDB = categoryO.get();
+			categoryDB.setName(category.getName());
+			categoryDB.setDescription(category.getDescription());
+			return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(categoryDB));
+		}
+		return ResponseEntity.notFound().build();
+
+	}
+
+	@DeleteMapping("/delete/categories/{id}")
+	public ResponseEntity<?> eliminar(@PathVariable Long id) {
+		Optional<Category> categoryO = service.porId(id);
+		if (categoryO.isPresent()) {
+			service.eliminar(id);
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.notFound().build();
+
+	}
 
 	private ResponseEntity<?> validacion(BindingResult result) {
 		Map<String, String> errores = new HashMap<>();
