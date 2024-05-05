@@ -11,6 +11,8 @@ public interface ICategoryService {
 
     Optional<Category> findByID(Long id);
 
+    List<Category> findByStatus(boolean status);
+
     Optional<Category> findByName(String name);
 
     Category save(Category category);

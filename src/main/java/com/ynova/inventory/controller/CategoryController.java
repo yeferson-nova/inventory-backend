@@ -62,7 +62,16 @@ public class CategoryController {
         return ResponseEntity.notFound().build();
     }
 
-    @PostMapping
+    @GetMapping("/categories/status/{status}")
+    public ResponseEntity<?> porEstado(@PathVariable boolean status) {
+        List<Category> categoriO = service.findByStatus(status);
+        if (categoriO.size() > 0) {
+            return ResponseEntity.ok().body(categoriO);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/categorias/save")
     public ResponseEntity<?> crear(@Valid @RequestBody Category category, BindingResult result) {
         if (result.hasErrors()) {
             return validacion(result);
@@ -114,6 +123,18 @@ public class CategoryController {
         categoryDB.setName(category.getName());
         categoryDB.setDescripcion(category.getDescripcion());
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(categoryDB));
+    }
+
+    @PutMapping("inactivate/category/{id}")
+    public ResponseEntity<?> inactivarCategoria(@PathVariable Long id) {
+        Optional<Category> categoryO = service.findByID(id);
+
+        if (categoryO.isPresent()) {
+            Category categoryDB = categoryO.get();
+            categoryDB.setStatus(false);
+            return ResponseEntity.ok().body(service.save(categoryDB));
+        }
+        return ResponseEntity.badRequest().body(Collections.singletonMap("Mensaje", "la categoria no existe"));
     }
 
     @DeleteMapping("delete/category/{id}")

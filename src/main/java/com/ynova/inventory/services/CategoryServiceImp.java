@@ -30,6 +30,12 @@ public class CategoryServiceImp implements ICategoryService {
     }
 
     @Override
+    public List<Category> findByStatus(boolean status) {
+
+        return (List<Category>) repository.findByStatus(status);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Optional<Category> findByName(String name) {
 
@@ -63,4 +69,5 @@ public class CategoryServiceImp implements ICategoryService {
 
         return repository.existsById(id);
     }
+
 }

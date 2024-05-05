@@ -32,4 +32,7 @@ public class Category implements Serializable {
 
     private String descripcion;
 
+    @NotBlank
+    private boolean status;
+
 }
