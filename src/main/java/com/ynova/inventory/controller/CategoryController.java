@@ -121,7 +121,7 @@ public class CategoryController {
         Optional<Category> categoryO = service.findByID(id);
         Category categoryDB = categoryO.get();
         categoryDB.setName(category.getName());
-        categoryDB.setDescripcion(category.getDescripcion());
+        categoryDB.setDescription(category.getDescription());
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(categoryDB));
     }
 
