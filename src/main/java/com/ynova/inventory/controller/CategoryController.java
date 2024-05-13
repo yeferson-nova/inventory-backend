@@ -114,14 +114,18 @@ public class CategoryController {
         if (result.hasErrors()) {
             return validacion(result);
         }
-        if (!category.getName().isEmpty() && service.existsByName(category.getName())) {
+        Optional<Category> categoryO = service.findByID(id);
+        if (!categoryO.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        Category categoryDB = categoryO.get();
+        if (!categoryDB.getName().equals(category.getName()) && service.existsByName(category.getName())) {
             return ResponseEntity.badRequest()
                     .body(Collections.singletonMap("Mensaje", "ya existe la categoria " + category.getName()));
         }
-        Optional<Category> categoryO = service.findByID(id);
-        Category categoryDB = categoryO.get();
         categoryDB.setName(category.getName());
         categoryDB.setDescription(category.getDescription());
+        categoryDB.setStatus(category.isStatus());
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(categoryDB));
     }
 
