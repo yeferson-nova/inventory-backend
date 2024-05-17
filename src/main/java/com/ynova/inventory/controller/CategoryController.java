@@ -48,7 +48,8 @@ public class CategoryController {
     public ResponseEntity<?> porId(@PathVariable Long id) {
         Optional<Category> categoriO = service.findByID(id);
         if (categoriO.isPresent()) {
-            return ResponseEntity.ok().body(categoriO.get());
+            List<Category> singleElement = Collections.singletonList(categoriO.get());
+            return ResponseEntity.ok().body(singleElement);
         }
         return ResponseEntity.notFound().build();
     }
@@ -57,7 +58,8 @@ public class CategoryController {
     public ResponseEntity<?> porNombre(@PathVariable String name) {
         Optional<Category> categoriO = service.findByName(name);
         if (categoriO.isPresent()) {
-            return ResponseEntity.ok().body(categoriO.get());
+            List<Category> singleElement = Collections.singletonList(categoriO.get());
+            return ResponseEntity.ok().body(singleElement);
         }
         return ResponseEntity.notFound().build();
     }
